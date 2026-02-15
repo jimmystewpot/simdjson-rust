@@ -1,6 +1,13 @@
 use std::{env, path::PathBuf};
 
 fn main() {
+    env::remove_var("CXXFLAGS");
+    env::remove_var("HOST_CXXFLAGS");
+    if let Ok(target) = env::var("TARGET") {
+        env::remove_var(format!("CXXFLAGS_{target}"));
+        env::remove_var(format!("CXXFLAGS_{}", target.replace('-', "_")));
+    }
+
     cc::Build::new()
         .cpp(true)
         .flag_if_supported("-std=c++17")
