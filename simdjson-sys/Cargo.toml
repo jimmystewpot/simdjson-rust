@@ -16,5 +16,5 @@ exclude = ["simdjson/", "!simdjson/singleheader/simdjson.*"]
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.66.1"
-cc = { version = "1.0.83", features = ["parallel"] }
+bindgen = "0.72.1"
+cc = { version = "1.2.56", features = ["parallel"] }

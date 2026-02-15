@@ -24,7 +24,7 @@ simdjson-sys = { path = "simdjson-sys", version = "0.1.0-alpha.2" }
 
 
 [dependencies]
-thiserror = "1.0"
+thiserror = "2.0.18"
 simdjson-sys = { workspace = true }
 
 # serde compatibilty
