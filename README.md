@@ -4,7 +4,7 @@
 [![Crates.io](https://img.shields.io/crates/v/simdjson-rust?style=for-the-badge)](https://crates.io/crates/simdjson-rust)
 [![docs.rs](https://img.shields.io/docsrs/simdjson-rust/latest?style=for-the-badge)](https://docs.rs/simdjson-rust)
 
-This crate currently uses [`simdjson 3.2.3`][simdjson]. You can have a try and give feedback.
+This crate currently uses [`simdjson 4.2.4`][simdjson]. You can have a try and give feedback.
 
 If you
 

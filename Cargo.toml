@@ -2,7 +2,7 @@
 name = "simdjson-rust"
 version = { workspace = true }
 authors = ["SunDoge <384813529@qq.com>"]
-edition = "2021"
+edition = "2024"
 license = "Apache-2.0"
 description = "Rust bindings for the simdjson project."
 homepage = "https://crates.io/crates/simdjson-rust"
@@ -20,11 +20,11 @@ members = ["simdjson-sys"]
 version = "0.3.0-alpha.3"
 
 [workspace.dependencies]
-simdjson-sys = { path = "simdjson-sys", version = "0.1.0-alpha.2" }
+simdjson-sys = { path = "simdjson-sys", version = "0.2.0-alpha" }
 
 
 [dependencies]
-thiserror = "1.0"
+thiserror = "2.0"
 simdjson-sys = { workspace = true }
 
 # serde compatibilty

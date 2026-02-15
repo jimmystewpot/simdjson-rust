@@ -5,8 +5,8 @@ use simdjson_sys as ffi;
 
 use super::{document::Document, document_stream::DocumentStream, element::Element};
 use crate::{
-    macros::{impl_drop, map_ptr_result},
     Result,
+    macros::{impl_drop, map_ptr_result},
 };
 
 pub struct Parser {
@@ -25,7 +25,7 @@ impl Parser {
         Self { ptr }
     }
 
-    pub fn parse(&mut self, padded_string: &String) -> Result<Element> {
+    pub fn parse(&mut self, padded_string: &String) -> Result<Element<'_>> {
         map_ptr_result!(ffi::SJ_DOM_parser_parse(
             self.ptr.as_ptr(),
             padded_string.as_ptr().cast(),
