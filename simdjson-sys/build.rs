@@ -3,8 +3,8 @@ use std::{env, path::PathBuf};
 fn main() {
     cc::Build::new()
         .cpp(true)
-        .flag_if_supported("-std=c++20")
-        .flag_if_supported("/std:c++20") // error C7555: use of designated initializers requires at least '/std:c++20'
+        .flag_if_supported("-std=c++17")
+        .flag_if_supported("/std:c++17") // error C7555: use of designated initializers requires at least '/std:c++20'
         .flag_if_supported("-pthread")
         .flag_if_supported("-O3")
         .flag_if_supported("/O2")
