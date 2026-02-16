@@ -83,6 +83,10 @@ impl<'a> Element<'a> {
         map_primitive_result!(ffi::SJ_DOM_element_get_bool(self.ptr.as_ptr()))
     }
 
+    pub fn is_null(&self) -> bool {
+        self.get_type() == ElementType::NullValue
+    }
+
     pub fn at_pointer(&self, json_pointer: &str) -> Result<Element<'_>> {
         map_ptr_result!(ffi::SJ_DOM_element_at_pointer(
             self.ptr.as_ptr(),
@@ -94,3 +98,13 @@ impl<'a> Element<'a> {
 }
 
 impl_drop!(Element<'a>, ffi::SJ_DOM_element_free);
+
+#[cfg(feature = "serde_impl")]
+impl std::fmt::Display for Element<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match crate::serde::value::element_to_value(self) {
+            Ok(value) => write!(f, "{value}"),
+            Err(e) => write!(f, "<error: {e}>"),
+        }
+    }
+}
