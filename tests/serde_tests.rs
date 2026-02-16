@@ -546,3 +546,100 @@ fn deserialize_newtype_struct() {
     let w: Wrapper = from_element(&elm).unwrap();
     assert_eq!(w, Wrapper(42));
 }
+
+// ---------------------------------------------------------------------------
+// Memory leak regression test: at_pointer method
+// ---------------------------------------------------------------------------
+
+#[test]
+fn at_pointer_functionality_test() {
+    // Test that at_pointer works correctly and doesn't cause issues
+    let json = r#"{
+        "users": [
+            {"name": "Alice", "age": 30, "active": true},
+            {"name": "Bob", "age": 25, "active": false}
+        ],
+        "metadata": {
+            "version": "1.0",
+            "count": 2
+        },
+        "settings": {
+            "theme": "dark",
+            "notifications": {
+                "email": true,
+                "push": false
+            }
+        }
+    }"#;
+
+    let mut parser = Parser::default();
+    let ps = json.to_padded_string();
+    let root = parser.parse(&ps).unwrap();
+
+    // Test basic at_pointer functionality
+    let users = root.at_pointer("/users").unwrap();
+    assert!(users.get_array().is_ok());
+
+    let first_user = root.at_pointer("/users/0").unwrap();
+    assert!(first_user.get_object().is_ok());
+
+    let user_name = root.at_pointer("/users/0/name").unwrap();
+    assert_eq!(user_name.get_string().unwrap(), "Alice");
+
+    let user_age = root.at_pointer("/users/0/age").unwrap();
+    assert_eq!(user_age.get_uint64().unwrap(), 30);
+
+    let metadata_version = root.at_pointer("/metadata/version").unwrap();
+    assert_eq!(metadata_version.get_string().unwrap(), "1.0");
+
+    let count = root.at_pointer("/metadata/count").unwrap();
+    assert_eq!(count.get_uint64().unwrap(), 2);
+
+    // Test nested at_pointer calls
+    let notifications = root.at_pointer("/settings/notifications").unwrap();
+    let email_setting = notifications.at_pointer("/email").unwrap();
+    assert_eq!(email_setting.get_bool().unwrap(), true);
+
+    // Test that elements are still accessible after multiple at_pointer calls
+    let push_setting = root.at_pointer("/settings/notifications/push").unwrap();
+    assert_eq!(push_setting.get_bool().unwrap(), false);
+
+    // Test round-trip through serde to ensure no corruption
+    let value = element_to_value(&root).unwrap();
+    let serialized = serde_json::to_string(&value).unwrap();
+    let reparsed: serde_json::Value = serde_json::from_str(&serialized).unwrap();
+    assert_eq!(value, reparsed);
+}
+
+#[test]
+fn at_pointer_extensive_usage() {
+    // Create a deeply nested structure and access many elements via at_pointer
+    // This stress test helps ensure no memory corruption or leaks
+    let mut json = String::from("{\"root\": ");
+    for i in 0..10 {
+        json.push_str(&format!("{{\"level_{}\": ", i));
+    }
+    json.push_str("\"deepest_value\"");
+    for _ in 0..10 {
+        json.push_str("}");
+    }
+    json.push('}');
+
+    let mut parser = Parser::default();
+    let ps = json.to_padded_string();
+    let root = parser.parse(&ps).unwrap();
+
+    // Access elements at various depths
+    let mut current_path = "/root".to_string();
+    for i in 0..10 {
+        let level_path = format!("{}/level_{}", current_path, i);
+        let element = root.at_pointer(&level_path).unwrap();
+        assert!(element.get_object().is_ok());
+        current_path = level_path;
+    }
+
+    // Access the final value
+    let value_path = format!("{}/level_9", current_path);
+    let deepest = root.at_pointer(&(value_path + "/level_9")).unwrap();
+    assert_eq!(deepest.get_string().unwrap(), "deepest_value");
+}

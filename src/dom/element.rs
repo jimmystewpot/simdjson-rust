@@ -87,7 +87,7 @@ impl<'a> Element<'a> {
         self.get_type() == ElementType::NullValue
     }
 
-    pub fn at_pointer(&self, json_pointer: &str) -> Result<Element<'_>> {
+    pub fn at_pointer(&self, json_pointer: &str) -> Result<Element<'a>> {
         map_ptr_result!(ffi::SJ_DOM_element_at_pointer(
             self.ptr.as_ptr(),
             json_pointer.as_ptr().cast(),
